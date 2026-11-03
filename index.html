@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sika – personal money tracker</title>
+<title>Bese – wealth tracker</title>
+<meta name="description" content="Bese tracks your MoMo, cash, bank, T-bills, land, businesses and debts in one place.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%231E6A49%22%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2225%22%20rx%3D%2215%22%20ry%3D%2223%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2225%22%20rx%3D%2215%22%20ry%3D%2223%22%20transform%3D%22rotate%2890%2050%2050%29%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2225%22%20rx%3D%2215%22%20ry%3D%2223%22%20transform%3D%22rotate%28180%2050%2050%29%22/%3E%3Cellipse%20cx%3D%2250%22%20cy%3D%2225%22%20rx%3D%2215%22%20ry%3D%2223%22%20transform%3D%22rotate%28270%2050%2050%29%22/%3E%3C/g%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2212%22%20fill%3D%22%23B9851A%22/%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%226%22%20fill%3D%22none%22%20stroke%3D%22%23F1F4EF%22%20stroke-width%3D%223%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,9 +52,10 @@ img{max-width:100%}
 .top-in{max-width:1080px;margin:0 auto;padding:14px 20px 0}
 .brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .logo{font-family:var(--display);font-weight:800;font-size:1.6rem;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
-.logo-mark{width:30px;height:30px;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden}
-.logo-mark i{display:block}
-.logo-mark i:nth-child(1){background:var(--s1)} .logo-mark i:nth-child(2){background:var(--s2)} .logo-mark i:nth-child(3){background:var(--s3)}
+.logo-mark{width:32px;height:32px;display:inline-block;color:var(--green);flex:none}
+.logo-mark svg{width:100%;height:100%;display:block}
+.about-mark{width:84px;height:84px;color:var(--green);flex:none}
+.about-mark svg{width:100%;height:100%}
 .saved{font-size:.8rem;color:var(--muted)}
 .tabs{display:flex;gap:4px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -279,7 +282,7 @@ table.cats td{padding:8px 0;border-top:1px solid var(--line)}
 <header class="top">
   <div class="top-in">
     <div class="brand">
-      <div class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span>Sika</div>
+      <div class="logo"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><ellipse cx="50" cy="25" rx="15" ry="23"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(90 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(180 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(270 50 50)"/></g><circle cx="50" cy="50" r="12" fill="var(--gold)"/><circle cx="50" cy="50" r="6" fill="none" stroke="var(--paper)" stroke-width="3"/></svg></span>Bese</div>
       <span class="saved" id="savedNote">Saved on this device</span>
     </div>
     <nav class="tabs" id="tabs" aria-label="Sections">
@@ -471,7 +474,7 @@ function onWriteError(err){
   const code = err && err.code;
   if (code === "quota_exceeded") toast("Storage is full. Export your data, then delete old entries.");
   else if (code === "invalid_argument" || code === "revoked" || code === "not_granted") { db = null; setMode("local"); toast("Couldn’t sync. Your changes are kept on this device."); }
-  else if (code && code!=="unavailable") toast("Couldn’t sync that change ("+code+"). It’s saved on this device; Sika will retry.");
+  else if (code && code!=="unavailable") toast("Couldn’t sync that change ("+code+"). It’s saved on this device; Bese will retry.");
   if (code === "unavailable") setTimeout(() => { if (db){ dirty.core = true; S.tx.forEach(t=>dirty.months.add(t.date.slice(0,7))); LOG.forEach(e=>dirty.logs.add(monthOf(e.ts))); flush(); } }, 1500 + Math.random()*1000);
 }
 function onSnap(snap){
@@ -677,7 +680,7 @@ function viewOverview(){
 
   const fresh = !S.tx.length && !S.inv.length && !S.props.length && !hasSample();
   return `${fxBanner()}${checkBanner()}
-  ${STANDALONE ? `<div class="banner" style="background:var(--green-soft)"><strong>Sika test version.</strong> Everything you enter stays in this browser on this device; nothing is sent anywhere.${fresh ? ` Want to look around first?<button class="btn small" data-action="sample-load">Load sample data</button>` : ""}</div>` : (fresh ? `<div class="banner" style="background:var(--green-soft)">New to Sika? Explore it with realistic sample figures first, then remove them in Setup.<button class="btn small" data-action="sample-load">Load sample data</button></div>` : "")}
+  ${STANDALONE ? `<div class="banner" style="background:var(--green-soft)"><strong>Bese test version.</strong> Everything you enter stays in this browser on this device; nothing is sent anywhere.${fresh ? ` Want to look around first?<button class="btn small" data-action="sample-load">Load sample data</button>` : ""}</div>` : (fresh ? `<div class="banner" style="background:var(--green-soft)">New to Bese? Explore it with realistic sample figures first, then remove them in Setup.<button class="btn small" data-action="sample-load">Load sample data</button></div>` : "")}
   <section class="hero">
     <div class="hero-label">What you’re worth today</div>
     <div class="row" style="gap:8px;align-items:center;margin-top:4px"><select class="input" id="nwCur" aria-label="Show net worth in" style="width:auto;padding:4px 8px;font-size:.85rem">${Object.keys(CURS).filter(c => rateOf(c)).map(c=>`<option value="${c}" ${c===dispCur()?"selected":""}>${esc(CURS[c].sym)} ${c}</option>`).join("")}</select><span class="small muted">Show my worth in another currency</span></div>
@@ -821,14 +824,14 @@ function viewInvestments(){
   return `${fxBanner()}<div class="section-head"><h2>Investments</h2><button class="btn primary small" data-action="add-inv">Add investment</button></div>
   <div class="stats"><div class="stat"><div class="k">Put in</div><div class="v">${money(p)}</div></div><div class="stat"><div class="k">Worth now</div><div class="v">${money(v)}</div></div><div class="stat"><div class="k">Gain</div><div class="v ${g>=0?"pos":"neg"}">${money(g)}${p>0?` <span class="small">(${(g/p*100).toFixed(1)}%)</span>`:""}</div></div></div>
   ${skipped?`<p class="small muted">Dollar holdings are left out of these totals until you set a rate.</p>`:""}
-  <div class="section">${list.length ? `<div class="list">${list.map(invRow).join("")}</div>` : `<div class="empty"><p>Track T-bills, fixed deposits, Eurobonds, shares, land and more. Sika reminds you when something is about to mature.</p><button class="btn primary" data-action="add-inv">Add your first investment</button></div>`}</div>`;
+  <div class="section">${list.length ? `<div class="list">${list.map(invRow).join("")}</div>` : `<div class="empty"><p>Track T-bills, fixed deposits, Eurobonds, shares, land and more. Bese reminds you when something is about to mature.</p><button class="btn primary" data-action="add-inv">Add your first investment</button></div>`}</div>`;
 }
 
 function viewAccounts(){
   let total=0; S.accounts.forEach(a=>{ const v=toGHS(balance(a),a.currency); if(v!=null) total+=v; });
   const rows = S.accounts.map(a => { const b = balance(a); return `<div class="acct-row"><button class="item" data-action="edit-acct" data-id="${esc(a.id)}"><span class="badge" aria-hidden="true">${esc(initials(a.name))}</span><span class="main"><span class="title">${esc(a.name)}</span><span class="sub">${esc(ACCOUNT_TYPES[a.type]||"Other")} · ${esc(curName(a.currency||"GHS"))}</span><span class="sub">${checkStatus(a)}</span></span><span class="amt ${b<0?"neg":""}">${money(b,a.currency)}</span></button><button class="btn small chk" data-action="check-acct" data-id="${esc(a.id)}">${a.type==="cash"?"Count cash":"Check balance"}</button></div>`; }).join("");
   return `${fxBanner()}<div class="section-head"><h2>Accounts</h2><button class="btn primary small" data-action="add-acct">Add account</button></div>
-  <p class="muted">Balances update from your transactions. Set each account’s starting balance once and Sika keeps it current.</p>
+  <p class="muted">Balances update from your transactions. Set each account’s starting balance once and Bese keeps it current.</p>
   <div class="panel" style="margin-bottom:16px"><h3>Cash in hand</h3><p class="small muted" style="margin:4px 0 10px">Money you’re holding as notes and coins: cash you withdrew but haven’t spent yet, or cash someone gave you.</p>
   <div class="row wrap"><button class="btn small" data-action="cash-withdraw">Withdraw cash (ATM / bank / MoMo)</button><button class="btn small" data-action="cash-gift">Cash received</button><button class="btn small" data-action="cash-deposit">Deposit cash</button></div></div>
   ${checkBanner(true)}
@@ -851,6 +854,8 @@ function viewSetup(){
     <div class="panel"><h3>Income categories</h3><table class="cats">${catList("income")}</table>
       <div class="row" style="margin-top:10px"><input class="input" id="newCat-income" placeholder="New category"><button class="btn small" data-action="add-cat" data-kind="income">Add</button></div></div>
   </section>
+  <section class="section panel"><div class="row" style="gap:16px;align-items:center;flex-wrap:wrap"><span class="about-mark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><ellipse cx="50" cy="25" rx="15" ry="23"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(90 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(180 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(270 50 50)"/></g><circle cx="50" cy="50" r="12" fill="var(--gold)"/><circle cx="50" cy="50" r="6" fill="none" stroke="var(--paper)" stroke-width="3"/></svg></span><div style="flex:1;min-width:220px"><h3>About the name</h3>
+    <p class="small" style="margin:6px 0 0"><strong>Bese</strong> comes from <strong>Bese Saka</strong>, “a sack of cola nuts”, the Akan Adinkra symbol of affluence, abundance and unity. Cola nuts were once a store of wealth shared among leaders, and the bigger the sack, the greater one’s standing. Bese helps you see, grow and share what you’ve built.</p></div></div></section>
   <section class="section panel">
     <h3>Your data</h3>
     <p class="muted small">${mode==="cloud" ? "Your records are saved privately to your account and follow you to other devices." : "Your records are saved in this browser on this device."} Deleting all data doesn’t erase your Activity history, and each deleted item can be restored from there.</p>
@@ -1148,15 +1153,15 @@ function drawLock(ls, recovery){
   const hasBio = !!bioId();
   const isPin = lockMode==="pin";
   ls.innerHTML = recovery ? `<div class="lock-card">
-      <div class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span>Sika</div>
+      <div class="logo"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><ellipse cx="50" cy="25" rx="15" ry="23"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(90 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(180 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(270 50 50)"/></g><circle cx="50" cy="50" r="12" fill="var(--gold)"/><circle cx="50" cy="50" r="6" fill="none" stroke="var(--paper)" stroke-width="3"/></svg></span>Bese</div>
       <h1>Use your recovery code</h1><p class="muted">Enter the 12-character code you wrote down when you set up the lock.</p>
       <input class="input lock-input" id="lkInput" autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX-XXXX" style="letter-spacing:.08em;font-size:1.2rem">
       <button class="btn primary" id="lkGo">Continue</button>
       <div class="err" id="lkErr"></div>
       <div class="lock-links"><button class="linkbtn" id="lkBack">Back</button></div></div>`
     : `<div class="lock-card">
-      <div class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span>Sika</div>
-      <h1>Sika is locked</h1><p class="muted">${isPin ? "Enter your PIN to open." : "Enter your password to open."}</p>
+      <div class="logo"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="currentColor"><ellipse cx="50" cy="25" rx="15" ry="23"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(90 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(180 50 50)"/><ellipse cx="50" cy="25" rx="15" ry="23" transform="rotate(270 50 50)"/></g><circle cx="50" cy="50" r="12" fill="var(--gold)"/><circle cx="50" cy="50" r="6" fill="none" stroke="var(--paper)" stroke-width="3"/></svg></span>Bese</div>
+      <h1>Bese is locked</h1><p class="muted">${isPin ? "Enter your PIN to open." : "Enter your password to open."}</p>
       <input class="input lock-input" id="lkInput" type="password" ${isPin ? `inputmode="numeric" maxlength="6" placeholder="••••"` : `placeholder="Password" style="letter-spacing:normal;font-size:1.1rem"`} autocomplete="off" aria-label="${isPin?"PIN":"Password"}">
       <button class="btn primary" id="lkGo">Unlock</button>
       ${hasBio ? `<button class="btn" id="lkBio">Use fingerprint</button>` : ""}
@@ -1193,7 +1198,7 @@ function drawLock(ls, recovery){
 
 function securityPanel(){
   if (!S.lock) return `<section class="section panel"><h3>App lock</h3>
-    <p class="muted small">Ask for a PIN, a password or your fingerprint whenever Sika opens, so nobody who picks up your phone can see your finances.</p>
+    <p class="muted small">Ask for a PIN, a password or your fingerprint whenever Bese opens, so nobody who picks up your phone can see your finances.</p>
     <button class="btn primary small" data-action="lock-setup" style="margin-top:6px">Set up app lock</button></section>`;
   const bio = !!bioId();
   const autoOpts = [1,5,15,30].map(m => `<option value="${m}" ${(S.lock.auto||5)===m?"selected":""}>After ${m} minute${m===1?"":"s"} of no use</option>`).join("");
@@ -1204,7 +1209,7 @@ function securityPanel(){
       <div class="sec-row"><span>Fingerprint on this device</span>${bio?`<button class="linkbtn" style="color:var(--red)" data-action="bio-off">Turn off</button>`:`<button class="linkbtn" data-action="bio-setup">Set up</button>`}</div>
       <div class="sec-row"><span>Lock automatically</span><select class="input" id="lockAuto" style="max-width:240px">${autoOpts}</select></div>
     </div>
-    <p class="small muted">Sika also locks when you leave it for more than a minute.</p>
+    <p class="small muted">Bese also locks when you leave it for more than a minute.</p>
     <div class="row wrap" style="margin-top:8px"><button class="btn small" data-action="lock-now">Lock now</button><button class="btn small" data-action="lock-change">Change PIN or password</button><button class="btn small danger" data-action="lock-off">Turn off app lock</button></div></section>`;
 }
 
@@ -1239,7 +1244,7 @@ function lockDialog(mode){ // mode: "new" | "change" | "reset"
     <div class="two"><label class="field"><span>Password (optional, 8+ characters)</span><input class="input" id="lPw" type="password" autocomplete="new-password" placeholder="${editing&&S.lock.pw?"Leave blank to keep current":""}"></label>
     <label class="field"><span>Repeat password</span><input class="input" id="lPw2" type="password" autocomplete="new-password"></label></div>
     ${editing&&S.lock.pw?`<label class="row small" style="margin-top:10px;gap:8px"><input type="checkbox" id="lPwOff"> Remove my password</label>`:""}
-    <p class="hint">Your PIN unlocks Sika quickly. A password is a second way in if you prefer typing one. Neither is stored as you type it, only as a one-way code.</p>
+    <p class="hint">Your PIN unlocks Bese quickly. A password is a second way in if you prefer typing one. Neither is stored as you type it, only as a one-way code.</p>
     <div class="err" id="lErr"></div>
   </div>
   <div class="dlg-foot">${mode==="reset"?"":`<button class="btn" data-close>Cancel</button>`}<button class="btn primary" id="lSave">${mode==="new"?"Turn on app lock":"Save"}</button></div>`);
@@ -1272,13 +1277,13 @@ function showRecovery(code){
 }
 async function setupBio(){
   const fail = (msg) => openDlg(`<div class="dlg-head"><h2>Fingerprint not available</h2><button class="iconbtn" data-close aria-label="Close">×</button></div><div class="dlg-body"><p style="margin:0">${msg}</p></div><div class="dlg-foot"><button class="btn primary" data-close>OK</button></div>`);
-  if (!window.PublicKeyCredential || !navigator.credentials || !navigator.credentials.create){ fail("This browser doesn’t support fingerprint unlock. Your PIN and password still protect Sika."); return; }
+  if (!window.PublicKeyCredential || !navigator.credentials || !navigator.credentials.create){ fail("This browser doesn’t support fingerprint unlock. Your PIN and password still protect Bese."); return; }
   try {
-    const cred = await navigator.credentials.create({publicKey:{challenge:rand(32), rp:{name:"Sika"}, user:{id:rand(16), name:"Sika user", displayName:"Sika user"},
+    const cred = await navigator.credentials.create({publicKey:{challenge:rand(32), rp:{name:"Bese"}, user:{id:rand(16), name:"Bese user", displayName:"Bese user"},
       pubKeyCredParams:[{type:"public-key", alg:-7},{type:"public-key", alg:-257}], authenticatorSelection:{authenticatorAttachment:"platform", userVerification:"required", residentKey:"discouraged"}, timeout:60000, attestation:"none"}});
     localStorage.setItem("sika:bio", b64(cred.rawId)); render(); toast("Fingerprint set up on this device");
   } catch(e){
-    fail(e && e.name==="NotAllowedError" ? "Fingerprint setup was cancelled, or this view isn’t allowed to use it. Inside the Claude app, browsers often block fingerprint access for pages like this one. Your PIN and password still protect Sika." : "Fingerprint access is blocked here. Inside the Claude app, browsers often don’t allow it for pages like this one. Your PIN and password still protect Sika, and fingerprint unlock will work in the Play Store version.");
+    fail(e && e.name==="NotAllowedError" ? "Fingerprint setup was cancelled, or this view isn’t allowed to use it. Inside the Claude app, browsers often block fingerprint access for pages like this one. Your PIN and password still protect Bese." : "Fingerprint access is blocked here. Inside the Claude app, browsers often don’t allow it for pages like this one. Your PIN and password still protect Bese, and fingerprint unlock will work in the Play Store version.");
   }
 }
 ["pointerdown","keydown","touchstart"].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, {passive:true}));
@@ -1303,7 +1308,7 @@ function disableScan(){ scanOK = false; render(); }
 function scanChoice(){
   openDlg(`<div class="dlg-head"><h2>Quick add</h2><button class="iconbtn" data-close aria-label="Close">×</button></div>
   <div class="dlg-body">
-  <div class="choice"><button class="btn" id="scStmt"><strong>📄 Import a bank statement</strong><br><span class="small muted">Excel, CSV or PDF statement from your bank or MoMo. Sika reads every line.</span></button><button class="btn" id="scSms"><strong>💬 Paste MoMo or bank SMS</strong><br><span class="small muted">Copy transaction messages and paste them. Sika reads them all at once.</span></button>
+  <div class="choice"><button class="btn" id="scStmt"><strong>📄 Import a bank statement</strong><br><span class="small muted">Excel, CSV or PDF statement from your bank or MoMo. Bese reads every line.</span></button><button class="btn" id="scSms"><strong>💬 Paste MoMo or bank SMS</strong><br><span class="small muted">Copy transaction messages and paste them. Bese reads them all at once.</span></button>
   ${scanOK ? `<button class="btn" id="scCam"><strong>📷 Take a photo of a receipt</strong><br><span class="small muted">Receipts, fuel and vending slips, pay-in and withdrawal slips, cheques.</span></button><button class="btn" id="scGal"><strong>🖼️ Choose a photo from gallery or files</strong></button>` : ""}</div>
   ${scanOK ? `<p class="small muted">For photos, lay the receipt flat in good light so the total is sharp.</p>` : ""}</div>`);
   dlg.querySelector("#scSms").addEventListener("click", () => { closeDlg(); smsDialog(); });
@@ -1331,8 +1336,8 @@ async function openCamera(){
     stream = await Promise.race([gum, new Promise((_, rej) => setTimeout(() => { const e = new Error("timeout"); e.name = "TimeoutError"; rej(e); }, 8000))]);
   } catch(e){
     if (dlg.open) closeDlg();
-    if (e && e.name==="TimeoutError") { cameraFallback("The camera didn’t start. The Claude app may not let pages like Sika use the camera on your phone."); return; }
-    cameraFallback(e && e.name==="NotAllowedError" ? "Sika wasn’t allowed to use the camera. Inside the Claude app, camera access is often blocked for pages like this one, or the permission was declined." : e && e.name==="NotFoundError" ? "No camera was found on this device." : "The camera couldn’t start here.");
+    if (e && e.name==="TimeoutError") { cameraFallback("The camera didn’t start. The Claude app may not let pages like Bese use the camera on your phone."); return; }
+    cameraFallback(e && e.name==="NotAllowedError" ? "Bese wasn’t allowed to use the camera. Inside the Claude app, camera access is often blocked for pages like this one, or the permission was declined." : e && e.name==="NotFoundError" ? "No camera was found on this device." : "The camera couldn’t start here.");
     return;
   }
   const stop = () => stream.getTracks().forEach(t => t.stop());
@@ -1412,7 +1417,7 @@ async function readReceipt(file){
   <div class="dlg-body" style="text-align:center"><div class="spinner" aria-hidden="true"></div>
   <p class="small muted" style="margin:0">This usually takes a few seconds and can take up to a minute.</p>
   <img class="scan-prev" src="${url}" alt="Your receipt">
-  <p class="small muted">The photo is sent to Claude to read, using your Claude account. Sika doesn’t keep the photo.</p></div>
+  <p class="small muted">The photo is sent to Claude to read, using your Claude account. Bese doesn’t keep the photo.</p></div>
   <div class="dlg-foot"><button class="btn" data-close>Cancel</button></div>`);
   const onClose = () => { if (!done) ctl.abort(); };
   dlg.addEventListener("close", onClose, {once:true});
@@ -1437,7 +1442,7 @@ async function readReceipt(file){
   const date = validDate ? data.date : today();
   const amount = Math.round(total*100)/100;
   const warn = [];
-  if (data.confidence==="low") warn.push("Sika wasn’t sure about the amount. Check it against the slip.");
+  if (data.confidence==="low") warn.push("Bese wasn’t sure about the amount. Check it against the slip.");
   else if (data.confidence==="medium") warn.push("Double-check the amount.");
   if (data.notes_for_user) warn.push(String(data.notes_for_user).slice(0,160));
   if (!validDate) warn.push(data.date ? "The date looked wrong, so it’s set to today." : "No date found, so it’s set to today.");
@@ -1522,8 +1527,8 @@ function askDepositSource(ctx, amount, cur, url, next){
   const chq = ctx.kind==="cheque";
   openDlg(`<div class="dlg-head"><h2>${chq?"Cheque":"Cash"} paid into ${esc(ctx.bankName)}</h2><button class="iconbtn" data-close aria-label="Cancel">×</button></div>
   <div class="dlg-body"><p style="margin:0">${chq
-      ? `Sika read a cheque pay-in slip for <strong>${money(amount, cur)}</strong>${ctx.drawer?` from ${esc(ctx.drawer)}`:""}${ctx.drawerBank?` (drawn on ${esc(ctx.drawerBank)})`:""}. Whose money is this?`
-      : `Sika read a cash pay-in slip for <strong>${money(amount, cur)}</strong>${ctx.depositor?` paid in by ${esc(ctx.depositor)}`:""}. Where did this cash come from?`}</p>
+      ? `Bese read a cheque pay-in slip for <strong>${money(amount, cur)}</strong>${ctx.drawer?` from ${esc(ctx.drawer)}`:""}${ctx.drawerBank?` (drawn on ${esc(ctx.drawerBank)})`:""}. Whose money is this?`
+      : `Bese read a cash pay-in slip for <strong>${money(amount, cur)}</strong>${ctx.depositor?` paid in by ${esc(ctx.depositor)}`:""}. Where did this cash come from?`}</p>
   <div class="choice">
     ${chq
       ? `<button class="btn" data-pick="own"><strong>My own money from another account</strong><br><span class="small muted">You wrote this cheque from another of your accounts. Recorded as a Transfer, not income.</span></button>
@@ -1576,8 +1581,8 @@ function matchBank(name, cur){
 function scanError(code, url, extra){
   const msgs = {
     not_receipt: "That photo doesn’t look like a receipt or payment slip.",
-    no_total: "Sika couldn’t read a total from that photo. Try a sharper, flatter photo in good light, or enter it yourself.",
-    not_granted: "Sika needs your permission to use Claude to read receipts. You declined, so scanning is off for now. Reopen Sika to be asked again.",
+    no_total: "Bese couldn’t read a total from that photo. Try a sharper, flatter photo in good light, or enter it yourself.",
+    not_granted: "Bese needs your permission to use Claude to read receipts. You declined, so scanning is off for now. Reopen Bese to be asked again.",
     image_rejected: "That image couldn’t be read. Try a JPEG or PNG photo.",
     rate_limited: "You’ve reached your Claude usage limit for now. Try again later, or enter this one yourself.",
     session_expired: "Your Claude session has expired. Sign in again, then retry.",
@@ -1608,7 +1613,7 @@ function chequeSection(compact){
   return `<div class="section-head" ${compact?"":`style="margin-bottom:8px"`}><h2>Cheques waiting to clear</h2></div>
   <div class="list" ${compact?"":`style="margin-bottom:24px"`}>${list.map(t => {
     const due = t.chq.nextAsk && t.chq.nextAsk<=today();
-    return `<div class="item"><span class="badge tr" aria-hidden="true">CQ</span><span class="main"><span class="title">${esc(t.note||"Cheque")}</span><span class="sub">${esc(chqLine(t))}</span><span class="sub">${due ? "Time to check if it has cleared" : "Sika will ask on "+esc(fmtDate(t.chq.nextAsk))}</span></span>
+    return `<div class="item"><span class="badge tr" aria-hidden="true">CQ</span><span class="main"><span class="title">${esc(t.note||"Cheque")}</span><span class="sub">${esc(chqLine(t))}</span><span class="sub">${due ? "Time to check if it has cleared" : "Bese will ask on "+esc(fmtDate(t.chq.nextAsk))}</span></span>
       <span class="act-right"><button class="btn small primary" data-action="chq-yes" data-id="${esc(t.id)}">Cleared</button><button class="btn small" data-action="chq-no" data-id="${esc(t.id)}">Not yet</button><button class="linkbtn" style="color:var(--red)" data-action="chq-bounced" data-id="${esc(t.id)}">Bounced</button></span></div>`;
   }).join("")}</div>`;
 }
@@ -1618,7 +1623,7 @@ function chqAnswer(id, ans){
   else if (ans==="no") t.chq = Object.assign({}, t.chq, {nextAsk: shiftDay(today(), 3)});
   else t.chq = Object.assign({}, t.chq, {status:"bounced", bouncedOn: today()});
   markMonth(t.date.slice(0,7)); render();
-  toast(ans==="yes" ? "Marked as cleared" : ans==="no" ? "Sika will ask again on "+fmtDate(t.chq.nextAsk) : "Marked as bounced. It no longer counts in your balances.");
+  toast(ans==="yes" ? "Marked as cleared" : ans==="no" ? "Bese will ask again on "+fmtDate(t.chq.nextAsk) : "Marked as bounced. It no longer counts in your balances.");
 }
 function maybeAskCheques(){
   if (chqTimer || needsLock() || dlg.open) return;
@@ -1632,11 +1637,11 @@ function askCheque(){
   openDlg(`<div class="dlg-head"><h2>Has this cheque cleared?</h2><button class="iconbtn" data-close aria-label="Ask me later">×</button></div>
   <div class="dlg-body"><p style="margin:0"><strong>${esc(t.note||"Cheque")}</strong></p><p class="small muted" style="margin:4px 0 0">${esc(chqLine(t))}</p>
   <div class="choice">
-    <button class="btn" data-ans="yes"><strong>Yes, it has cleared</strong><br><span class="small muted">Sika won’t ask about it again.</span></button>
-    <button class="btn" data-ans="no"><strong>Not yet</strong><br><span class="small muted">Sika will ask again in 3 days.</span></button>
+    <button class="btn" data-ans="yes"><strong>Yes, it has cleared</strong><br><span class="small muted">Bese won’t ask about it again.</span></button>
+    <button class="btn" data-ans="no"><strong>Not yet</strong><br><span class="small muted">Bese will ask again in 3 days.</span></button>
     <button class="btn" data-ans="bounced"><strong>It bounced or was returned</strong><br><span class="small muted">It stays on record but no longer counts in your balances.</span></button>
   </div></div>
-  <div class="dlg-foot"><button class="btn" data-close>Ask me next time I open Sika</button></div>`);
+  <div class="dlg-foot"><button class="btn" data-close>Ask me next time I open Bese</button></div>`);
   dlg.querySelectorAll("[data-ans]").forEach(b => b.addEventListener("click", () => { closeDlg(); chqAnswer(t.id, b.dataset.ans); }));
 }
 
@@ -1717,9 +1722,9 @@ function viewRecurring(){
       <div class="row wrap">${recurDue(r) && r.mode!=="auto" ? `<button class="btn small primary" data-action="recur-record" data-id="${esc(r.id)}">Record now</button><button class="btn small" data-action="recur-skip" data-id="${esc(r.id)}">Skip this one</button>` : ""}<button class="btn small" data-action="recur-edit" data-id="${esc(r.id)}">Edit</button>${done ? "" : `<button class="btn small" data-action="recur-toggle" data-id="${esc(r.id)}">${r.active?"Pause":"Resume"}</button>`}</div></div>`;
   }).join("");
   return `<div class="section-head"><h2>Recurring</h2><button class="btn primary small" data-action="recur-add">Add recurring</button></div>
-  <p class="muted">Salary, rent, school fees, subscriptions, utilities and loan repayments that repeat. Sika adds them on the due date, or asks you first when the amount changes.</p>
+  <p class="muted">Salary, rent, school fees, subscriptions, utilities and loan repayments that repeat. Bese adds them on the due date, or asks you first when the amount changes.</p>
   ${S.recur.length ? `<div class="stats"><div class="stat"><div class="k">Regular money in, a month</div><div class="v pos">${money(monthlyIn)}</div></div><div class="stat"><div class="k">Regular money out, a month</div><div class="v neg">${money(monthlyOut)}</div></div><div class="stat"><div class="k">Waiting for you</div><div class="v">${due.length}</div></div></div>` : ""}
-  <div class="section">${list.length ? `<div class="cards">${cards}</div>` : `<div class="empty"><p>Nothing set up yet. Add your salary, rent, school fees, DStv, ECG or loan repayments and Sika keeps track of them.</p><button class="btn primary" data-action="recur-add">Add your first one</button></div>`}</div>`;
+  <div class="section">${list.length ? `<div class="cards">${cards}</div>` : `<div class="empty"><p>Nothing set up yet. Add your salary, rent, school fees, DStv, ECG or loan repayments and Bese keeps track of them.</p><button class="btn primary" data-action="recur-add">Add your first one</button></div>`}</div>`;
 }
 function recurDialog(r){
   const isNew = !r;
@@ -1749,7 +1754,7 @@ function recurDialog(r){
       <label class="row small" style="gap:8px;margin-bottom:6px"><input type="radio" name="rMode" value="auto" ${r.mode==="auto"?"checked":""}> Add it automatically. Best when the amount is always the same, like rent or salary.</label>
       <label class="row small" style="gap:8px"><input type="radio" name="rMode" value="confirm" ${r.mode!=="auto"?"checked":""}> Ask me first. Best when the amount changes, like ECG, water or fuel.</label></div>
     <label class="field"><span>Note (optional)</span><input class="input" id="rNote" value="${esc(r.note)}"></label>
-    <p class="hint">If the first due date is in the past and you choose automatic, Sika also adds the ones you missed.</p>
+    <p class="hint">If the first due date is in the past and you choose automatic, Bese also adds the ones you missed.</p>
     <div class="err" id="rErr"></div>
   </div>
   <div class="dlg-foot">${isNew?"":`<button class="btn danger" id="rDel">Delete</button><span class="spacer"></span>`}<button class="btn" data-close>Cancel</button><button class="btn primary" id="rSave">${isNew?"Add":"Save"}</button></div>`, draw);
@@ -1952,7 +1957,7 @@ function smsToRows(msgs){
       case "to_bank": { const b = matchBank(m.bank_name, "GHS") || firstBank; Object.assign(r, {type:"transfer", toAccountId: b && b.id, note:"To "+(m.bank_name||"bank")}); if (m.bank_name && !matchBank(m.bank_name,"GHS")) r.warn.push("Choose the bank account it went to."); break; }
       case "from_bank": { const b = matchBank(m.bank_name, "GHS") || firstBank; Object.assign(r, {type:"transfer", toAccountId: acc && acc.id, accountId: b && b.id, note:"From "+(m.bank_name||"bank")}); break; }
       case "airtime_data": Object.assign(r, {type:"expense", category:pickCat("expense","Airtime & data"), note:who||"Airtime / data"}); break;
-      case "other": Object.assign(r, {type:"expense", category:pickCat("expense","Other"), note:who||"SMS transaction", sel:false}); r.warn.push("Sika wasn’t sure what this was. Check the type before including it."); break;
+      case "other": Object.assign(r, {type:"expense", category:pickCat("expense","Other"), note:who||"SMS transaction", sel:false}); r.warn.push("Bese wasn’t sure what this was. Check the type before including it."); break;
       default: Object.assign(r, {type:"expense", category:pickCat("expense","Other"), note:(who||"Payment")+(refTxt?" – "+refTxt:"")});
     }
     if (!hasDate) r.warn.push("The message has no date, so it’s set to today. Change it if the payment was on another day.");
@@ -1992,18 +1997,18 @@ function smsReview(rows){
       let b = balance(a);
       rows.forEach(r => { if (!r.sel) return; const amt = Number(r.amount)||0; if (r.type==="income" && r.accountId===id) b += amt; else if (r.type==="expense" && r.accountId===id) b -= amt; else if (r.type==="transfer"){ if (r.accountId===id) b -= amt; if (r.toAccountId===id) b += amt; } });
       const diff = Math.abs(b - byAcc[id]) < 0.01;
-      return `<div class="small" style="margin-top:4px">${esc(a.name)}: the latest SMS says <strong>${money(byAcc[id], a.currency)}</strong>; Sika will show <strong>${money(b, a.currency)}</strong> after saving. ${diff ? "✓ They match." : "They don’t match. An earlier transaction may be missing, or the starting balance may need updating."}</div>`;
+      return `<div class="small" style="margin-top:4px">${esc(a.name)}: the latest SMS says <strong>${money(byAcc[id], a.currency)}</strong>; Bese will show <strong>${money(b, a.currency)}</strong> after saving. ${diff ? "✓ They match." : "They don’t match. An earlier transaction may be missing, or the starting balance may need updating."}</div>`;
     }).join("");
   };
   const draw = () => {
     const n = rows.filter(r=>r.sel).length;
-    dlg.querySelector("#smsRows").innerHTML = (n ? "" : `<div class="banner" style="margin-top:10px">Nothing is ticked, so nothing will be saved. Sika unticks messages that look already recorded. Tick the ones you want to add.</div>`) + rows.map(rowHtml).join("");
+    dlg.querySelector("#smsRows").innerHTML = (n ? "" : `<div class="banner" style="margin-top:10px">Nothing is ticked, so nothing will be saved. Bese unticks messages that look already recorded. Tick the ones you want to add.</div>`) + rows.map(rowHtml).join("");
     dlg.querySelector("#smsBal").innerHTML = balCheck();
     dlg.querySelector("#smsSave").textContent = n ? "Save "+n+" transaction"+(n===1?"":"s") : "Nothing selected";
     dlg.querySelector("#smsSave").disabled = !n;
   };
   openDlg(`<div class="dlg-head"><h2>Check your messages</h2><button class="iconbtn" data-close aria-label="Close">×</button></div>
-  <div class="dlg-body"><p class="small muted" style="margin:0">Sika found ${rows.filter(r=>!r.isFee).length} transaction${rows.filter(r=>!r.isFee).length===1?"":"s"}${rows.some(r=>r.isFee)?", plus the fees and E-Levy charged":""}. Untick anything you don’t want, fix anything that’s wrong, then save.</p>
+  <div class="dlg-body"><p class="small muted" style="margin:0">Bese found ${rows.filter(r=>!r.isFee).length} transaction${rows.filter(r=>!r.isFee).length===1?"":"s"}${rows.some(r=>r.isFee)?", plus the fees and E-Levy charged":""}. Untick anything you don’t want, fix anything that’s wrong, then save.</p>
     <div id="smsBal"></div><div id="smsRows"></div><div class="err" id="smsErr2"></div></div>
   <div class="dlg-foot"><button class="btn" data-close>Cancel</button><button class="btn primary" id="smsSave">Save</button></div>`, draw);
   const body = dlg.querySelector(".dlg-body");
@@ -2209,7 +2214,7 @@ function stmtDialog(){
   <div class="dlg-body"><p class="small muted" style="margin:0">Download your statement from internet banking, your banking app or MoMo, or ask your bank to email it. <strong>Excel or CSV</strong> gives the most accurate result; PDF works too.</p>
     <label class="field"><span>Which account is this statement for?</span><select class="input" id="stA">${S.accounts.map(a=>`<option value="${esc(a.id)}" ${a.id===defA?"selected":""}>${esc(a.name)}</option>`).join("")}</select></label>
     <label class="field"><span>Statement file</span><input class="input" id="stF" type="file" accept=".csv,.xlsx,.xls,.pdf,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
-    <p class="hint">Sika reads the file on your device. For PDF statements, and to sort transactions into categories, the text is sent to Claude to read. Account numbers are left out of what Sika saves.</p>
+    <p class="hint">Bese reads the file on your device. For PDF statements, and to sort transactions into categories, the text is sent to Claude to read. Account numbers are left out of what Bese saves.</p>
     <div class="err" id="stErr"></div></div>
   <div class="dlg-foot"><button class="btn" data-close>Cancel</button><button class="btn primary" id="stGo">Read statement</button></div>`);
   dlg.querySelector("#stGo").addEventListener("click", async () => {
@@ -2240,7 +2245,7 @@ function stmtDialog(){
         let mp = detectMap(rows);
         items = mp ? mapRows(rows, mp) : [];
         if (!items.length){ prog("Working out the columns…"); mp = await aiMap(rows); items = mp ? mapRows(rows, mp) : []; }
-        if (!items.length) throw new Error("Sika couldn’t find the date and amount columns in this file. Check it’s the statement itself, not a summary page.");
+        if (!items.length) throw new Error("Bese couldn’t find the date and amount columns in this file. Check it’s the statement itself, not a summary page.");
       }
       if (!items.length) throw new Error("No transactions were found in this statement.");
       const ai = await aiClassify(items, prog);
@@ -2273,7 +2278,7 @@ function stmtReview(items, accId, ai){
     seen[key] = (seen[key]||0) + 1;
     r.id = "b-"+hashStr(key+"|"+seen[key]);
     if (S.tx.some(t => t.id===r.id)){ r.sel = false; r.warn = "Already imported."; }
-    else { const dup = S.tx.find(t => Math.abs((Number(t.amount)||0)-it.amount)<0.005 && t.date===it.date && (t.accountId===accId || t.toAccountId===accId)); if (dup){ r.sel = false; r.warn = "Already in Sika"+(dup.note?" (“"+dup.note.slice(0,30)+"”)":"")+"."; } }
+    else { const dup = S.tx.find(t => Math.abs((Number(t.amount)||0)-it.amount)<0.005 && t.date===it.date && (t.accountId===accId || t.toAccountId===accId)); if (dup){ r.sel = false; r.warn = "Already in Bese"+(dup.note?" (“"+dup.note.slice(0,30)+"”)":"")+"."; } }
     return r;
   });
   const asc = rows.length>1 && rows[0].date <= rows[rows.length-1].date;
@@ -2285,7 +2290,7 @@ function stmtReview(items, accId, ai){
     const sel = rows.filter(r=>r.sel), inn = sel.filter(r=>r.dir==="in").reduce((s,r)=>s+(Number(r.amount)||0),0), out = sel.filter(r=>r.dir==="out").reduce((s,r)=>s+(Number(r.amount)||0),0);
     const after = balance(A) + effect();
     let bal = "";
-    if (finalBal!=null){ const match = Math.abs(after - finalBal) < 0.01; bal = `<div class="small" style="margin-top:6px">Statement closing balance: <strong>${money(finalBal, A.currency)}</strong>. ${esc(A.name)} in Sika after import: <strong>${money(after, A.currency)}</strong>. ${match ? "✓ They match." : "They don’t match. Some transactions may already be in Sika, or "+esc(A.name)+"’s starting balance may need updating in Accounts."}</div>`; }
+    if (finalBal!=null){ const match = Math.abs(after - finalBal) < 0.01; bal = `<div class="small" style="margin-top:6px">Statement closing balance: <strong>${money(finalBal, A.currency)}</strong>. ${esc(A.name)} in Bese after import: <strong>${money(after, A.currency)}</strong>. ${match ? "✓ They match." : "They don’t match. Some transactions may already be in Bese, or "+esc(A.name)+"’s starting balance may need updating in Accounts."}</div>`; }
     return `<div class="small muted">${dates[0]?esc(fmtDate(dates[0]))+" – "+esc(fmtDate(dates[dates.length-1])):""} · ${rows.length} lines · ${sel.length} selected · in ${money(inn, A.currency)} · out ${money(out, A.currency)}</div>${bal}`;
   };
   const otherOpts = sel => S.accounts.filter(a => a.id!==accId).map(a => `<option value="${esc(a.id)}" ${a.id===sel?"selected":""}>${esc(a.name)}</option>`).join("");
@@ -2304,7 +2309,7 @@ function stmtReview(items, accId, ai){
     const n = rows.filter(r=>r.sel).length; const b = dlg.querySelector("#stSave"); b.textContent = n ? "Import "+n+" transaction"+(n===1?"":"s") : "Nothing selected"; b.disabled = !n;
   };
   openDlg(`<div class="dlg-head"><h2>Check the statement</h2><button class="iconbtn" data-close aria-label="Close">×</button></div>
-  <div class="dlg-body"><p class="small" style="margin:0"><strong>${esc(A.name)}</strong>. Lines already in Sika are unticked. Change any type or category, untick what you don’t want, then import.</p>
+  <div class="dlg-body"><p class="small" style="margin:0"><strong>${esc(A.name)}</strong>. Lines already in Bese are unticked. Change any type or category, untick what you don’t want, then import.</p>
     <div id="stSum" style="margin:8px 0"></div>
     <div class="row" style="gap:14px;margin-bottom:6px"><button class="linkbtn" id="stAll">Select all</button><button class="linkbtn" id="stNone">Select none</button></div>
     <div id="stRows"></div><div class="err" id="stErr2"></div></div>
@@ -2376,7 +2381,7 @@ function checkDialog(a){
     const date = dlg.querySelector("#ckDate").value || today();
     const raw = dlg.querySelector("#ckAmt").value.trim(), actual = raw==="" ? null : num(raw);
     const c = calc(date, isNaN(actual) ? null : actual);
-    let h = `<div class="rec-grid"><span>Sika’s balance on ${esc(fmtDate(date))}</span><span class="v">${money(c.book, a.currency)}</span>`;
+    let h = `<div class="rec-grid"><span>Bese’s balance on ${esc(fmtDate(date))}</span><span class="v">${money(c.book, a.currency)}</span>`;
     if (c.pend.length){
       c.pend.forEach(t => { h += `<span class="small muted">${pendingEffect(t,a.id)>0?"Less":"Add back"}: cheque not yet cleared – ${esc((t.note||"Cheque").slice(0,40))}</span><span class="v small">${money(-pendingEffect(t,a.id), a.currency)}</span>`; });
       h += `<span class="tot">What the ${isCash?"count":"bank"} should show</span><span class="v tot">${money(c.expected, a.currency)}</span>`;
@@ -2388,8 +2393,8 @@ function checkDialog(a){
       if (ok) h += `<p class="small pos" style="margin:0">Everything matches.</p>`;
       else {
         const tips = [];
-        if (c.diff<0) tips.push((isCash ? "Cash spent that wasn’t recorded" : "Money out that isn’t in Sika yet, such as bank charges, COT, SMS alerts, E-Levy or a POS payment")+".");
-        else tips.push((isCash ? "Cash received that wasn’t recorded" : "Money in that isn’t in Sika yet, such as interest, a transfer or a refund")+".");
+        if (c.diff<0) tips.push((isCash ? "Cash spent that wasn’t recorded" : "Money out that isn’t in Bese yet, such as bank charges, COT, SMS alerts, E-Levy or a POS payment")+".");
+        else tips.push((isCash ? "Cash received that wasn’t recorded" : "Money in that isn’t in Bese yet, such as interest, a transfer or a refund")+".");
         if (Math.abs(c.diff) < 50 && !isCash) tips.push("Small differences are usually fees or E-Levy. Pasting the latest SMS or importing the statement often finds them.");
         if (due.length) tips.push("Due but not recorded: "+due.map(r=>r.name+" ("+money(r.amount, recurCur(r))+")").join(", ")+".");
         tips.push("A transaction recorded against the wrong account or date.");
@@ -2519,8 +2524,8 @@ function localInsights(h){
   if (h.illiquid>0.7) out.push({type:"tip", title:Math.round(h.illiquid*100)+"% of your assets are property and businesses", detail:"Land, houses and businesses are hard to turn into cash quickly. Keeping more in liquid savings protects you when you need money fast."});
   const ex = exposure().filter(x => x.c!=="GHS"); const fxPct = ex.reduce((s,x)=>s+x.pct,0);
   if (fxPct>0) out.push({type:"tip", title:Math.round(fxPct)+"% of your assets are in foreign currency", detail: ex.map(x=>curName(x.c)+" "+Math.round(x.pct)+"%").join(", ")+". This protects you if the cedi weakens, but your cedi net worth will move with exchange rates."});
-  const held = heldGHS(); if (held>0) out.push({type:"tip", title:"You’re holding "+moneyD(held)+" for others", detail:"It sits in your accounts but isn’t yours. Sika already leaves it out of your net worth and emergency cushion."});
-  const unchecked = S.accounts.filter(needsCheck); if (unchecked.length) out.push({type:"tip", title:unchecked.length+" account"+(unchecked.length>1?"s":"")+" not checked this month", detail:"Comparing Sika with your bank and MoMo balances catches missing fees and errors.", action:"Use Check balance in Accounts."});
+  const held = heldGHS(); if (held>0) out.push({type:"tip", title:"You’re holding "+moneyD(held)+" for others", detail:"It sits in your accounts but isn’t yours. Bese already leaves it out of your net worth and emergency cushion."});
+  const unchecked = S.accounts.filter(needsCheck); if (unchecked.length) out.push({type:"tip", title:unchecked.length+" account"+(unchecked.length>1?"s":"")+" not checked this month", detail:"Comparing Bese with your bank and MoMo balances catches missing fees and errors.", action:"Use Check balance in Accounts."});
   const oldChq = S.tx.filter(t => chqPending(t) && daysUntil(t.date) < -7); if (oldChq.length) out.push({type:"warning", title:oldChq.length+" cheque"+(oldChq.length>1?"s":"")+" uncleared for over a week", detail:"Confirm with your bank whether they cleared or bounced."});
   const recIn = recurMonthly(r=>r.type==="income"), recOut = recurMonthly(r=>r.type==="expense"||r.type==="loan");
   if (recIn>0 && recOut>0) out.push({type: recOut/recIn>0.6 ? "warning" : "tip", title:"Fixed commitments take "+Math.round(recOut/recIn*100)+"% of regular income", detail:"Your recurring bills and repayments come to "+moneyD(recOut)+" a month against "+moneyD(recIn)+" of regular income."});
@@ -2550,13 +2555,13 @@ function viewInsights(){
   return `<div class="section-head"><h2>Insights</h2></div>
   <section class="panel"><div class="score">${ring}<div style="min-width:150px"><div class="small muted">Financial health score</div><div style="font-family:var(--display);font-weight:800;font-size:1.6rem">${label}</div><div class="small muted">Out of 100, from your saving, cash cushion, debt, balance of assets and record keeping.</div></div>
     <div class="comp">${h.comp.map(c=>`<span>${esc(c.k)}</span><div class="bar"><i style="width:${(c.v/c.max*100).toFixed(0)}%"></i></div><span class="small muted">${Math.round(c.v)}/${c.max}</span><span></span><span class="small muted" style="grid-column:2/-1;margin-top:-4px">${esc(c.note)}</span>`).join("")}</div></div></section>
-  <section class="section"><div class="section-head"><h2>Sika AI analysis</h2>${sampleNS ? `<button class="btn primary small" data-action="ai-ins" ${aiBusy?"disabled":""}>${aiBusy ? "Analysing…" : aiIns ? "Refresh analysis" : "Analyse my finances"}</button>` : ""}</div>
-    ${!sampleNS ? `<div class="empty"><p>${STANDALONE ? "AI analysis and “Ask Sika” are part of the full version of Sika." : "AI analysis needs Claude, which isn’t available in this view."} The insights below are worked out on your device.</p></div>`
-      : aiIns ? `<div class="panel" style="margin-bottom:12px"><div style="font-family:var(--display);font-weight:700;font-size:1.15rem">${esc(aiIns.headline||"")}</div>${aiIns.summary?`<p style="margin:8px 0 0">${esc(aiIns.summary)}</p>`:""}<div class="small muted" style="margin-top:8px">Analysed ${esc(aiInsAt?fmtDate(aiInsAt.slice(0,10)):"")}. Based only on what you’ve recorded in Sika. Not professional financial advice.</div></div>
+  <section class="section"><div class="section-head"><h2>Bese AI analysis</h2>${sampleNS ? `<button class="btn primary small" data-action="ai-ins" ${aiBusy?"disabled":""}>${aiBusy ? "Analysing…" : aiIns ? "Refresh analysis" : "Analyse my finances"}</button>` : ""}</div>
+    ${!sampleNS ? `<div class="empty"><p>${STANDALONE ? "AI analysis and “Ask Bese” are part of the full version of Bese." : "AI analysis needs Claude, which isn’t available in this view."} The insights below are worked out on your device.</p></div>`
+      : aiIns ? `<div class="panel" style="margin-bottom:12px"><div style="font-family:var(--display);font-weight:700;font-size:1.15rem">${esc(aiIns.headline||"")}</div>${aiIns.summary?`<p style="margin:8px 0 0">${esc(aiIns.summary)}</p>`:""}<div class="small muted" style="margin-top:8px">Analysed ${esc(aiInsAt?fmtDate(aiInsAt.slice(0,10)):"")}. Based only on what you’ve recorded in Bese. Not professional financial advice.</div></div>
         <div class="ins-grid">${(aiIns.insights||[]).map(card).join("")}</div>
         ${(aiIns.next_steps||[]).length ? `<div class="panel" style="margin-top:12px"><h3>Your next steps</h3><ol style="margin:8px 0 0;padding-left:20px">${aiIns.next_steps.map(x=>`<li style="margin:4px 0">${esc(x)}</li>`).join("")}</ol></div>` : ""}`
-      : `<div class="empty"><p>Sika’s AI reads your totals, trends, debts, investments and forecast, then explains what’s going well, what to watch and what to do next.</p><p class="small">Your figures, not your transaction notes, are sent to Claude using your Claude account.</p></div>`}
-    ${sampleNS ? `<div class="panel" style="margin-top:12px"><h3>Ask Sika about your money</h3><div class="ask"><input class="input" id="askQ" placeholder="e.g. Can I afford a GH₵ 30,000 car loan? Where can I cut spending?"><button class="btn primary" data-action="ai-ask">Ask</button></div><div class="answer" id="askA"></div></div>` : ""}
+      : `<div class="empty"><p>Bese’s AI reads your totals, trends, debts, investments and forecast, then explains what’s going well, what to watch and what to do next.</p><p class="small">Your figures, not your transaction notes, are sent to Claude using your Claude account.</p></div>`}
+    ${sampleNS ? `<div class="panel" style="margin-top:12px"><h3>Ask Bese about your money</h3><div class="ask"><input class="input" id="askQ" placeholder="e.g. Can I afford a GH₵ 30,000 car loan? Where can I cut spending?"><button class="btn primary" data-action="ai-ask">Ask</button></div><div class="answer" id="askA"></div></div>` : ""}
   </section>
   <section class="section"><div class="section-head"><h2>Quick insights</h2></div><div class="ins-grid">${local.length ? local.map(card).join("") : `<div class="empty"><p>Record a few weeks of income and spending to see insights.</p></div>`}</div></section>`;
 }
@@ -2565,14 +2570,14 @@ async function runAiInsights(){
   aiBusy = true; render();
   const h = healthScore();
   try {
-    const data = await sampleNS.json(`You are Sika’s financial analyst for a user in Ghana. Analyse the JSON summary of their finances below (all money in Ghana cedis unless stated). Be specific, use their actual numbers, and be practical for life in Ghana (MoMo, cedi exposure, treasury bills, family obligations). Don’t quote market interest rates or prices you weren’t given. Don’t moralise. Reply with ONLY JSON:
+    const data = await sampleNS.json(`You are Bese’s financial analyst for a user in Ghana. Analyse the JSON summary of their finances below (all money in Ghana cedis unless stated). Be specific, use their actual numbers, and be practical for life in Ghana (MoMo, cedi exposure, treasury bills, family obligations). Don’t quote market interest rates or prices you weren’t given. Don’t moralise. Reply with ONLY JSON:
 {"headline": one sentence verdict, "summary": 2-3 sentences, "insights": [6 to 9 items of {"type": "warning"|"opportunity"|"win"|"tip", "title": short, "detail": 1-2 sentences with numbers, "action": one concrete next step or null}], "next_steps": [3 to 5 short prioritised actions]}.
 
 Summary:
 ${JSON.stringify(insSummary(h))}`, {modelTier:"default", cache:false});
     if (data && Array.isArray(data.insights)){ aiIns = data; aiInsAt = new Date().toISOString(); try { localStorage.setItem("sika:ai", JSON.stringify({data, at: aiInsAt})); } catch(e){} }
     else toast("The analysis came back empty. Try again.");
-  } catch(e){ toast(e && e.code==="rate_limited" ? "Claude usage limit reached. Try again later." : e && e.code==="not_granted" ? "Sika wasn’t allowed to use Claude." : "Couldn’t run the analysis. Try again."); if (e && e.code==="not_granted") sampleNS = null; }
+  } catch(e){ toast(e && e.code==="rate_limited" ? "Claude usage limit reached. Try again later." : e && e.code==="not_granted" ? "Bese wasn’t allowed to use Claude." : "Couldn’t run the analysis. Try again."); if (e && e.code==="not_granted") sampleNS = null; }
   aiBusy = false; render();
 }
 async function runAsk(){
@@ -2581,7 +2586,7 @@ async function runAsk(){
   out.textContent = "Thinking…";
   try {
     const h = healthScore();
-    const r = await sampleNS(`You are Sika’s financial assistant for a user in Ghana. Answer their question using only the summary of their finances below (Ghana cedis unless stated). Be direct and practical, show the key numbers and your working briefly, and say what extra information would change the answer. Don’t quote market rates you weren’t given. Plain text, no markdown headings, under 200 words. End with one short line noting this isn’t professional financial advice.
+    const r = await sampleNS(`You are Bese’s financial assistant for a user in Ghana. Answer their question using only the summary of their finances below (Ghana cedis unless stated). Be direct and practical, show the key numbers and your working briefly, and say what extra information would change the answer. Don’t quote market rates you weren’t given. Plain text, no markdown headings, under 200 words. End with one short line noting this isn’t professional financial advice.
 
 Summary: ${JSON.stringify(insSummary(h))}
 
@@ -2705,7 +2710,7 @@ async function downloadPDF(){
     await loadScript(JSPDF.core); await loadScript(JSPDF.table);
     const d = reportData(), cur = d.cur, cvt = v => fromGHS(v, cur) ?? v;
     const doc = new window.jspdf.jsPDF({unit:"pt", format:"a4"}), green = [30,106,73];
-    doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.text("Sika financial report", 40, 52);
+    doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.text("Bese financial report", 40, 52);
     doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90);
     doc.text(pdfSafe(d.label+"  |  Amounts in "+cur+"  |  Generated "+fmtDate(today())), 40, 70); doc.setTextColor(0);
     const opts = (startY, head, body, extra) => Object.assign({startY, head:[head], body, theme:"grid", styles:{fontSize:9, cellPadding:4}, headStyles:{fillColor:green, textColor:255}, margin:{left:40, right:40}}, extra||{});
@@ -2725,8 +2730,8 @@ async function downloadPDF(){
     const body = d.txs.slice(0,300).map(t => { const a = acct(t.accountId), to = acct(t.toAccountId); return [t.date, {income:"In",expense:"Out",transfer:"Transfer",custody:"Not mine"}[t.type]||t.type, pdfSafe(t.note||t.category||""), pdfSafe(t.type==="transfer"?(a?a.name:"")+" > "+(to?to.name:""):(a?a.name:"")), pdfMoney((t.type==="expense"||(t.type==="custody"&&t.dir==="out")?-1:1)*t.amount, a?a.currency:"GHS")]; });
     if (body.length) doc.autoTable(opts(yy, ["Date", "Type", "Description", "Account", "Amount"], body, {styles:{fontSize:8, cellPadding:3}, columnStyles:{4:{halign:"right"}}}));
     const pages = doc.internal.getNumberOfPages();
-    for (let i=1;i<=pages;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120); doc.text("Sika  |  Page "+i+" of "+pages+"  |  Prepared from records kept in Sika; not an official bank statement.", 40, doc.internal.pageSize.getHeight()-20); }
-    await saveFile({filename:"sika-report-"+d.from+"-to-"+d.to+".pdf", data: doc.output("blob")});
+    for (let i=1;i<=pages;i++){ doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120); doc.text("Bese  |  Page "+i+" of "+pages+"  |  Prepared from records kept in Bese; not an official bank statement.", 40, doc.internal.pageSize.getHeight()-20); }
+    await saveFile({filename:"bese-report-"+d.from+"-to-"+d.to+".pdf", data: doc.output("blob")});
   } catch(e){ if (!(e && (e.code==="cancelled"||e.code==="declined"))) toast("Couldn’t create the PDF here."); }
 }
 async function downloadXLSX(){
@@ -2737,12 +2742,12 @@ async function downloadXLSX(){
     const X = window.XLSX, d = reportData(), cur = d.cur, cvt = v => { const r = fromGHS(v, cur); return Math.round((r==null?v:r)*100)/100; };
     const wb = X.utils.book_new();
     const sheet = (rows, widths) => { const ws = X.utils.aoa_to_sheet(rows); ws["!cols"] = widths.map(w=>({wch:w})); return ws; };
-    X.utils.book_append_sheet(wb, sheet([["Sika financial report"], [d.label], ["Amounts in "+cur], [], ["Money in", cvt(d.inc)], ["Money out", cvt(d.exp)], ["Kept", cvt(d.inc-d.exp)], ["Net worth today", cvt(d.w.net)], [], ["Expenses by category", "Amount", "Share"], ...(Object.keys(d.ec).length ? Object.entries(d.ec).sort((a,b)=>b[1]-a[1]).map(([c,v])=>[c, cvt(v), d.exp>0?Math.round(v/d.exp*1000)/10+"%":""]).concat([["Total", cvt(d.exp), ""]]) : [["No expenses in this period"]]), [], ["Income by category", "Amount"], ...Object.entries(d.ic).sort((a,b)=>b[1]-a[1]).map(([c,v])=>[c, cvt(v)])], [28,16]), "Summary");
+    X.utils.book_append_sheet(wb, sheet([["Bese financial report"], [d.label], ["Amounts in "+cur], [], ["Money in", cvt(d.inc)], ["Money out", cvt(d.exp)], ["Kept", cvt(d.inc-d.exp)], ["Net worth today", cvt(d.w.net)], [], ["Expenses by category", "Amount", "Share"], ...(Object.keys(d.ec).length ? Object.entries(d.ec).sort((a,b)=>b[1]-a[1]).map(([c,v])=>[c, cvt(v), d.exp>0?Math.round(v/d.exp*1000)/10+"%":""]).concat([["Total", cvt(d.exp), ""]]) : [["No expenses in this period"]]), [], ["Income by category", "Amount"], ...Object.entries(d.ic).sort((a,b)=>b[1]-a[1]).map(([c,v])=>[c, cvt(v)])], [28,16]), "Summary");
     X.utils.book_append_sheet(wb, sheet([["Type","Item","Currency","Value","In "+cur], ...d.assets.map(r=>[r[0], r[1], r[2], Math.round(r[3]*100)/100, r[4]==null?"":cvt(r[4])]), ["Total assets","","","",cvt(d.w.assets)], [], ...d.liabs.map(r=>[r[0], r[1], r[2], Math.round(r[3]*100)/100, r[4]==null?"":cvt(r[4])]), ["Total owed and held","","","",cvt(d.w.debts+d.w.held)], [], ["Net worth","","","",cvt(d.w.net)]], [16,34,10,14,14]), "Net worth");
     X.utils.book_append_sheet(wb, sheet([["Date","Type","Description","Category","Account","To account","Currency","Amount","Amount in "+cur,"Source"], ...d.txs.map(t => { const a = acct(t.accountId), to = acct(t.toAccountId), sign = (t.type==="expense"||(t.type==="custody"&&t.dir==="out"))?-1:1; return [t.date, {income:"Money in",expense:"Money out",transfer:"Transfer",custody:"Not mine"}[t.type]||t.type, t.note||"", t.category||"", a?a.name:"", to?to.name:"", a?a.currency:"GHS", sign*t.amount, sign*cvt(txGHSamt(t)), t.src||"manual"]; })], [11,11,36,22,18,18,9,12,14,10]), "Transactions");
     X.utils.book_append_sheet(wb, sheet([["Month","Start","In","Out","End"], ...d.fc.rows.map(r=>[monthLabel(r.m), cvt(r.start), cvt(r.inn), cvt(r.out), cvt(r.end)])], [18,14,14,14,14]), "Forecast");
     const buf = X.write(wb, {bookType:"xlsx", type:"array"});
-    await saveFile({filename:"sika-report-"+d.from+"-to-"+d.to+".xlsx", data: new Blob([buf], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})});
+    await saveFile({filename:"bese-report-"+d.from+"-to-"+d.to+".xlsx", data: new Blob([buf], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})});
   } catch(e){ if (!(e && (e.code==="cancelled"||e.code==="declined"))) toast("Couldn’t create the Excel file here."); }
 }
 
@@ -3276,7 +3281,7 @@ async function exportCSV(){
   const rows = [["Date","Type","Amount","Currency","Account","To account","Category","Note"]];
   S.tx.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(t => { const a=acct(t.accountId), to=acct(t.toAccountId); rows.push([t.date,t.type,t.amount,a?a.currency:"GHS",a?a.name:"",to?to.name:"",t.category||"",t.note||""]); });
   const csv = rows.map(r=>r.map(v=>{ v=String(v==null?"":v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }).join(",")).join("\n");
-  try { await saveFile({filename:"sika-transactions-"+today()+".csv", data:csv}); } catch(e){ /* viewer declined */ }
+  try { await saveFile({filename:"bese-transactions-"+today()+".csv", data:csv}); } catch(e){ /* viewer declined */ }
 }
 function resetAll(btn){
   if (!armed(btn, "Tap again to delete everything")) return;
