@@ -680,7 +680,7 @@ function viewOverview(){
 
   const fresh = !S.tx.length && !S.inv.length && !S.props.length && !hasSample();
   return `${fxBanner()}${checkBanner()}
-  ${STANDALONE ? `<div class="banner" style="background:var(--green-soft)"><strong>Bese test version.</strong> Everything you enter stays in this browser on this device; nothing is sent anywhere.${fresh ? ` Want to look around first?<button class="btn small" data-action="sample-load">Load sample data</button>` : ""}</div>` : (fresh ? `<div class="banner" style="background:var(--green-soft)">New to Bese? Explore it with realistic sample figures first, then remove them in Setup.<button class="btn small" data-action="sample-load">Load sample data</button></div>` : "")}
+  ${STANDALONE && !bannerHidden() ? `<div class="banner" style="background:var(--green-soft)"><button class="linkbtn" data-action="hide-banner" aria-label="Hide this message" style="float:right;margin-left:8px">✕</button><strong>Bese test version.</strong> Everything you enter stays in this browser on this device; nothing is sent anywhere.${fresh ? ` Want to look around first?<button class="btn small" data-action="sample-load">Load sample data</button>` : ""}</div>` : (fresh ? `<div class="banner" style="background:var(--green-soft)">New to Bese? Explore it with realistic sample figures first, then remove them in Setup.<button class="btn small" data-action="sample-load">Load sample data</button></div>` : "")}
   <section class="hero">
     <div class="hero-label">What you’re worth today</div>
     <div class="row" style="gap:8px;align-items:center;margin-top:4px"><select class="input" id="nwCur" aria-label="Show net worth in" style="width:auto;padding:4px 8px;font-size:.85rem">${Object.keys(CURS).filter(c => rateOf(c)).map(c=>`<option value="${c}" ${c===dispCur()?"selected":""}>${esc(CURS[c].sym)} ${c}</option>`).join("")}</select><span class="small muted">Show my worth in another currency</span></div>
@@ -2752,19 +2752,20 @@ async function downloadXLSX(){
 }
 
 /* ---------- Sample data ---------- */
+function bannerHidden(){ try { return localStorage.getItem("bese:hideBanner")==="1"; } catch(e){ return false; } }
 function hasSample(){ return [S.accounts, S.tx, S.inv, S.props, S.biz, S.debts, S.recur, S.held, S.goals].some(l => (l||[]).some(x => String(x.id||"").indexOf("demo-")===0)); }
 function loadSample(){
   if (hasSample()) return;
   const t = today(), d = k => shiftDay(t, k), m = k => shiftMonth(t.slice(0,7), k);
   const day = (mo, dd) => { const [y,mm] = mo.split("-").map(Number); return ymd(y, mm, Math.min(dd, new Date(y, mm, 0).getDate())); };
-  const A = [{id:"demo-momo", name:"MTN MoMo", type:"momo", currency:"GHS", opening:1500}, {id:"demo-bank", name:"GCB current account", type:"bank", currency:"GHS", opening:8000}, {id:"demo-cash", name:"Cash in hand", type:"cash", currency:"GHS", opening:600}, {id:"demo-usd", name:"Dollar account", type:"bank", currency:"USD", opening:1200}];
+  const A = [{id:"demo-momo", name:"MTN MoMo", type:"momo", currency:"GHS", opening:4500}, {id:"demo-bank", name:"GCB current account", type:"bank", currency:"GHS", opening:8000}, {id:"demo-cash", name:"Cash in hand", type:"cash", currency:"GHS", opening:600}, {id:"demo-usd", name:"Dollar account", type:"bank", currency:"USD", opening:1200}];
   const tx = []; let n = 0;
   const add = (o) => { if (o.date > t) return; tx.push(Object.assign({id:"demo-t"+(n++), ts:Date.now()+n}, o)); };
   for (let k=3;k>=0;k--){
     const mo = m(-k);
     add({type:"income", amount:9500, date:day(mo,25), accountId:"demo-bank", category:"Salary", note:"Salary", recurId: k===0 ? undefined : "demo-r-sal"});
     add({type:"expense", amount:2000, date:day(mo,1), accountId:"demo-bank", category:"Rent & housing", note:"Rent", recurId:"demo-r-rent"});
-    add({type:"transfer", amount:1500, date:day(mo,26), accountId:"demo-bank", toAccountId:"demo-momo", note:"Bank to MoMo"});
+    add({type:"transfer", amount:2500, date:day(mo,26), accountId:"demo-bank", toAccountId:"demo-momo", note:"Bank to MoMo"});
     add({type:"transfer", amount:500, date:day(mo,27), accountId:"demo-bank", toAccountId:"demo-cash", note:"ATM withdrawal"});
     [3,10,17,24].forEach((dd,i) => add({type:"expense", amount:[320,280,410,350][i]+k*15, date:day(mo,dd), accountId:"demo-momo", category:"Food & groceries", note:["Makola market","Shoprite","Melcom","Madina market"][i]}));
     add({type:"expense", amount:450+k*40, date:day(mo,8), accountId:"demo-momo", category:"Transport & fuel", note:"GOIL fuel"});
@@ -2778,6 +2779,7 @@ function loadSample(){
   add({type:"custody", dir:"in", amount:1200, date:d(-6), accountId:"demo-momo", heldId:"demo-h1", note:"Funeral contributions"});
   add({type:"income", amount:2500, date:d(-2), accountId:"demo-bank", category:"Business", note:"Cheque #004512 from client", chq:{status:"pending", nextAsk:d(1)}});
   if (!S.cats.expense.includes("Bank & MoMo charges")) S.cats.expense.push("Bank & MoMo charges");
+  S.accounts = S.accounts.filter(a => acctUsed(a));
   S.accounts = S.accounts.concat(A.filter(a => !(a.id==="demo-cash" && S.accounts.some(x=>x.type==="cash"))));
   if (!S.accounts.some(a=>a.id==="demo-cash")) tx.forEach(x => { if (x.accountId==="demo-cash") x.accountId = (S.accounts.find(a=>a.type==="cash")||{}).id; if (x.toAccountId==="demo-cash") x.toAccountId = (S.accounts.find(a=>a.type==="cash")||{}).id; });
   S.tx = S.tx.concat(tx);
@@ -3182,6 +3184,7 @@ document.addEventListener("click", e => {
   switch (el.dataset.action){
     case "add-tx": txDialog(); break;
     case "sample-load": loadSample(); break;
+    case "hide-banner": try { localStorage.setItem("bese:hideBanner","1"); } catch(e){} render(); break;
     case "sample-remove": if (armed(el, "Tap again to remove")) removeSample(); break;
     case "ai-ins": runAiInsights(); break;
     case "ai-ask": runAsk(); break;
